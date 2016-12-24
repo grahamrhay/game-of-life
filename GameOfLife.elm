@@ -1,3 +1,4 @@
+import Array
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Random
@@ -15,19 +16,19 @@ main =
 -- MODEL
 
 type Cell = Dead | Alive
-type alias Row = List Cell
-type alias Board = List Row
+type alias Row = Array.Array Cell
+type alias Board = Array.Array Row
 type alias Model = Board
 
 init : (Model, Cmd Msg)
 init =
-    ([], Random.generate NewBoard (seedBoard))
+    (Array.empty, Random.generate NewBoard (seedBoard))
 
-seedBoard : Random.Generator Board
+seedBoard : Random.Generator (List (List Cell))
 seedBoard =
     Random.list 5 seedRow
 
-seedRow : Random.Generator Row
+seedRow : Random.Generator (List Cell)
 seedRow =
     Random.list 5 seedCell
 
@@ -38,7 +39,7 @@ seedCell =
 -- UPDATE
 
 type Msg =
-    NewBoard Board |
+    NewBoard (List (List Cell)) |
     Tick Time.Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -46,8 +47,16 @@ update msg model =
     case msg of
         Tick t ->
             (nextGeneration model, Cmd.none)
-        NewBoard board ->
-            (board, Cmd.none)
+        NewBoard cells ->
+            (toBoard cells, Cmd.none)
+
+toBoard : (List (List Cell)) -> Board
+toBoard cells =
+    Array.fromList (List.map toRow cells)
+
+toRow : (List Cell) -> Row
+toRow cells =
+    Array.fromList cells
 
 nextGeneration : Board -> Board
 nextGeneration board =
@@ -67,14 +76,14 @@ view model =
         h1 [] [ text "Game Of Life" ],
         div [ class "board" ] [
             table [ style [ ("border-collapse", "collapse"), ("border", "1px solid black") ] ] [
-                tbody [] (List.map renderRow model)
+                tbody [] (Array.toList (Array.map renderRow model))
             ]
         ]
     ]
 
 renderRow : Row -> Html Msg
 renderRow row =
-    tr [] (List.map renderCell row)
+    tr [] (Array.toList (Array.map renderCell row))
 
 renderCell : Cell -> Html Msg
 renderCell cell =
