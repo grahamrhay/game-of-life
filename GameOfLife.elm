@@ -26,11 +26,11 @@ init =
 
 seedBoard : Random.Generator (List (List Cell))
 seedBoard =
-    Random.list 5 seedRow
+    Random.list 80 seedRow
 
 seedRow : Random.Generator (List Cell)
 seedRow =
-    Random.list 5 seedCell
+    Random.list 80 seedCell
 
 seedCell : Random.Generator Cell
 seedCell =
@@ -154,7 +154,7 @@ renderRow row =
 
 renderCell : Cell -> Html Msg
 renderCell cell =
-    td [ style [ ("border", "1px solid black"), ("height", "50px"), ("width", "50px"), ("background-color", backgroundColor cell) ] ] []
+    td [ style [ ("border", "1px solid black"), ("height", "5px"), ("width", "5px"), ("background-color", backgroundColor cell) ] ] []
 
 backgroundColor : Cell -> String
 backgroundColor cell =
