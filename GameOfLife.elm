@@ -1,6 +1,7 @@
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Random
+import Time
 
 main: Program Never Model Msg
 main =
@@ -8,7 +9,7 @@ main =
         init = init,
         view = view,
         update = update,
-        subscriptions = \_ -> Sub.none
+        subscriptions = subscriptions
     }
 
 -- MODEL
@@ -38,15 +39,25 @@ seedCell =
 
 type Msg =
     NewBoard Board |
-    Tick
+    Tick Time.Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        Tick ->
-            (model, Cmd.none)
+        Tick t ->
+            (nextGeneration model, Cmd.none)
         NewBoard board ->
             (board, Cmd.none)
+
+nextGeneration : Board -> Board
+nextGeneration board =
+    board
+
+-- SUBSCRIPTIONS
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+      Time.every Time.second Tick
 
 -- VIEW
 
