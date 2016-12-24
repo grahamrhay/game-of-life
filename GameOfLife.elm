@@ -22,11 +22,12 @@ init =
     (emptyBoard, Cmd.none)
 
 emptyBoard : Board
-emptyBoard = [
-        [ Dead, Dead, Dead ],
-        [ Dead, Dead, Dead ],
-        [ Dead, Dead, Dead ]
-    ]
+emptyBoard =
+    List.map emptyRow (List.range 1 5)
+
+emptyRow : Int -> Row
+emptyRow i =
+    List.map (\m -> Dead) (List.range 1 5)
 
 -- UPDATE
 
