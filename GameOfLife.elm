@@ -60,7 +60,17 @@ toRow cells =
 
 nextGeneration : Board -> Board
 nextGeneration board =
-    board
+    Array.indexedMap (\i r -> (nextGenRow i r board)) board
+
+nextGenRow : Int -> Row -> Board -> Row
+nextGenRow rowIndex row board =
+    Array.indexedMap (\i c -> (nextGenCell i rowIndex c board)) row
+
+nextGenCell : Int -> Int -> Cell -> Board -> Cell
+nextGenCell cellIndex rowIndex cell board =
+    case cell of
+        Alive -> Dead
+        Dead -> Alive
 
 -- SUBSCRIPTIONS
 
