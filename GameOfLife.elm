@@ -64,13 +64,70 @@ nextGeneration board =
 
 nextGenRow : Int -> Row -> Board -> Row
 nextGenRow rowIndex row board =
-    Array.indexedMap (\i c -> (nextGenCell i rowIndex c board)) row
+    Array.indexedMap (\i c -> (nextGenCell c (liveNeighbours rowIndex i board))) row
 
-nextGenCell : Int -> Int -> Cell -> Board -> Cell
-nextGenCell cellIndex rowIndex cell board =
+liveNeighbours : Int -> Int -> Board -> Int
+liveNeighbours rowIndex colIndex board =
+    liveNeighboursAbove rowIndex colIndex board +
+    liveNeighboursAdjacent rowIndex colIndex board +
+    liveNeighboursBelow rowIndex colIndex board
+
+liveNeighboursAbove : Int -> Int -> Board -> Int
+liveNeighboursAbove rowIndex colIndex board =
+    isAlive (rowIndex - 1) (colIndex - 1) board +
+    isAlive (rowIndex - 1) (colIndex) board +
+    isAlive (rowIndex - 1) (colIndex + 1) board
+
+liveNeighboursAdjacent : Int -> Int -> Board -> Int
+liveNeighboursAdjacent rowIndex colIndex board =
+    isAlive rowIndex (colIndex - 1) board +
+    isAlive rowIndex (colIndex + 1) board
+
+liveNeighboursBelow : Int -> Int -> Board -> Int
+liveNeighboursBelow rowIndex colIndex board =
+    isAlive (rowIndex + 1) (colIndex - 1) board +
+    isAlive (rowIndex + 1) (colIndex) board +
+    isAlive (rowIndex + 1) (colIndex + 1) board
+
+isAlive : Int -> Int -> Board -> Int
+isAlive rowIndex colIndex board =
+    case (getCell colIndex (getRow rowIndex board)) of
+        Alive -> 1
+        Dead -> 0
+
+getRow : Int -> Board -> Row
+getRow i board =
+    case Array.get i board of
+        Just row -> row
+        Nothing ->
+            case Array.get ((Array.length board) - 1) board of
+                Just row -> row
+                Nothing -> Debug.crash "oops"
+
+getCell : Int -> Row -> Cell
+getCell i row =
+    case Array.get i row of
+        Just cell -> cell
+        Nothing ->
+            case Array.get ((Array.length row) - 1) row of
+                Just cell -> cell
+                Nothing -> Debug.crash "oops"
+
+nextGenCell : Cell -> Int -> Cell
+nextGenCell cell liveNeighbours =
     case cell of
-        Alive -> Dead
-        Dead -> Alive
+        Alive ->
+            if liveNeighbours < 2 then
+               Dead
+            else if liveNeighbours > 3 then
+               Dead
+            else
+               Alive
+        Dead ->
+            if liveNeighbours == 3 then
+                Alive
+            else
+                Dead
 
 -- SUBSCRIPTIONS
 
