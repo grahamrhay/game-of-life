@@ -1,5 +1,6 @@
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Random
 
 main: Program Never Model Msg
 main =
@@ -19,19 +20,24 @@ type alias Model = Board
 
 init : (Model, Cmd Msg)
 init =
-    (emptyBoard, Cmd.none)
+    ([], Random.generate NewBoard (seedBoard))
 
-emptyBoard : Board
-emptyBoard =
-    List.map emptyRow (List.range 1 5)
+seedBoard : Random.Generator Board
+seedBoard =
+    Random.list 5 seedRow
 
-emptyRow : Int -> Row
-emptyRow i =
-    List.map (\m -> Dead) (List.range 1 5)
+seedRow : Random.Generator Row
+seedRow =
+    Random.list 5 seedCell
+
+seedCell : Random.Generator Cell
+seedCell =
+    Random.map (\b -> if b then Dead else Alive) Random.bool
 
 -- UPDATE
 
 type Msg =
+    NewBoard Board |
     Tick
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -39,6 +45,8 @@ update msg model =
     case msg of
         Tick ->
             (model, Cmd.none)
+        NewBoard board ->
+            (board, Cmd.none)
 
 -- VIEW
 
@@ -58,5 +66,11 @@ renderRow row =
     tr [] (List.map renderCell row)
 
 renderCell : Cell -> Html Msg
-renderCell box =
-    td [ style [ ("border", "1px solid black"), ("height", "50px"), ("width", "50px") ] ] []
+renderCell cell =
+    td [ style [ ("border", "1px solid black"), ("height", "50px"), ("width", "50px"), ("background-color", backgroundColor cell) ] ] []
+
+backgroundColor : Cell -> String
+backgroundColor cell =
+    case cell of
+        Alive -> "black"
+        Dead -> "white"
